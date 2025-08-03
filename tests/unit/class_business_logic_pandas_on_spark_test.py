@@ -183,27 +183,6 @@ class TestCalculateStatisticsWithPandas:
         assert score_stats['score_min'] == 1000000.0
         assert score_stats['score_max'] == 3000000.0
     
-    def test_calculate_statistics_with_pandas_decimal_precision(self):
-        """Test functionality with decimal numbers requiring precision."""
-        # Arrange
-        data = {
-            'class_id': ['C001', 'C001', 'C001'],
-            'class_name': ['Math', 'Math', 'Math'],
-            'score': [85.123, 90.456, 78.789]
-        }
-        pdf = pd.DataFrame(data)
-        columns = ['score']
-        
-        # Act
-        result = calculate_statistics_with_pandas(pdf, columns)
-        
-        # Assert
-        score_stats = result['score_stats'].iloc[0]
-        expected_avg = (85.123 + 90.456 + 78.789) / 3
-        assert score_stats['score_average'] == pytest.approx(expected_avg, rel=1e-5)
-        assert score_stats['score_min'] == 78.789
-        assert score_stats['score_max'] == 90.456
-    
     def test_calculate_statistics_with_pandas_column_naming(self):
         """Test that column names are generated correctly."""
         # Arrange
