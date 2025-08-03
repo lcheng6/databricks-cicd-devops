@@ -1,0 +1,8 @@
+import os
+
+def get_class_data_from_api(spark):
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    class_example_data_path = os.path.join(current_dir, "data/Class_Dataset.csv")
+    class_example_data_path = "file:/Workspace" + class_example_data_path
+    print(class_example_data_path)
+    df_class = spark.read.csv(class_example_data_path, header=True, inferSchema=True)
