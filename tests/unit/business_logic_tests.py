@@ -13,23 +13,20 @@ from library.business_logic import calculate_statistics
 from library.class_business_logic import calculate_statistics_with_sql
 
 
+spark = SparkSession.builder.appName("TestCalculateStatisticsWithSQL").getOrCreate()
+
 class TestCalculateStatisticsWithSQL:
     """Test suite for the calculate_statistics_with_sql function."""
     
-    @classmethod
-    def setup_class(cls):
-        """Set up Spark session for testing."""
-        cls.spark = SparkSession.builder \
-            .appName("BusinessLogicTests") \
-            .master("local[*]") \
-            .config("spark.sql.execution.arrow.pyspark.enabled", "false") \
-            .getOrCreate()
-        cls.spark.sparkContext.setLogLevel("ERROR")
+    # @classmethod
+    # def setup_class(cls):
+    #     """Set up Spark session for testing."""
+    #     cls.spark = SparkSession.builder.appName("TestCalculateStatisticsWithSQL2").getOrCreate()
     
-    @classmethod
-    def teardown_class(cls):
-        """Clean up Spark session after testing."""
-        cls.spark.stop()
+    # @classmethod
+    # def teardown_class(cls):
+    #     """Clean up Spark session after testing."""
+    #     cls.spark.stop()
     
     def test_calculate_statistics_with_sql_basic_case(self):
         """Test basic functionality with normal data."""
@@ -50,11 +47,11 @@ class TestCalculateStatisticsWithSQL:
             ("C002", "Science", 82.0)
         ]
         
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = ['score']
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_collected = result.collect()
         
         # Assert
@@ -92,11 +89,11 @@ class TestCalculateStatisticsWithSQL:
             ("C001", "Math", 78.0, 85.0)
         ]
         
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = ['score', 'attendance']
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_row = result.collect()[0]
         
         # Assert
@@ -127,11 +124,11 @@ class TestCalculateStatisticsWithSQL:
             ("C002", "Science", 92.0)
         ]
         
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = ['score']
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_collected = result.collect()
         
         # Assert
@@ -158,11 +155,11 @@ class TestCalculateStatisticsWithSQL:
             ("C001", "Math", None)   # Another NULL value
         ]
         
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = ['score']
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_row = result.collect()[0]
         
         # Assert
@@ -181,11 +178,11 @@ class TestCalculateStatisticsWithSQL:
         ])
         
         data = [("C001", "Math", 85.0)]
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = []
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_row = result.collect()[0]
         
         # Assert
@@ -210,11 +207,11 @@ class TestCalculateStatisticsWithSQL:
             ("C001", "Math", 85.0)
         ]
         
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = ['score']
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_row = result.collect()[0]
         
         # Assert
@@ -237,11 +234,11 @@ class TestCalculateStatisticsWithSQL:
             ("C001", "Math", 3000000.0)
         ]
         
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = ['score']
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_row = result.collect()[0]
         
         # Assert
@@ -264,11 +261,11 @@ class TestCalculateStatisticsWithSQL:
             ("C001", "Math", 78.789)
         ]
         
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = ['score']
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_row = result.collect()[0]
         
         # Assert
@@ -288,11 +285,11 @@ class TestCalculateStatisticsWithSQL:
         ])
         
         data = [("C001", "Math", 85.0, 90.0)]
-        df = self.spark.createDataFrame(data, schema)
+        df = spark.createDataFrame(data, schema)
         columns = ['test_score', 'homework_score']
         
         # Act
-        result = calculate_statistics_with_sql(df, columns, self.spark)
+        result = calculate_statistics_with_sql(df, columns, spark)
         result_row = result.collect()[0]
         column_names = result_row.asDict().keys()
         
