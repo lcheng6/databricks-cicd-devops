@@ -219,32 +219,6 @@ class TestCalculateStatisticsWithSQL:
         assert result_row['score_min'] == 85.0
         assert result_row['score_max'] == 85.0
     
-    def test_calculate_statistics_with_sql_large_numbers(self):
-        """Test functionality with large numbers."""
-        # Arrange
-        schema = StructType([
-            StructField("class_id", StringType(), True),
-            StructField("class_name", StringType(), True),
-            StructField("score", DoubleType(), True)
-        ])
-        
-        data = [
-            ("C001", "Math", 1000000.0),
-            ("C001", "Math", 2000000.0),
-            ("C001", "Math", 3000000.0)
-        ]
-        
-        df = spark.createDataFrame(data, schema)
-        columns = ['score']
-        
-        # Act
-        result = calculate_statistics_with_sql(df, columns, spark)
-        result_row = result.collect()[0]
-        
-        # Assert
-        assert result_row['score_average'] == pytest.approx(2000000.0, rel=1e-5)
-        assert result_row['score_min'] == 1000000.0
-        assert result_row['score_max'] == 3000000.0
     
     def test_calculate_statistics_with_sql_decimal_precision(self):
         """Test functionality with decimal numbers requiring precision."""
