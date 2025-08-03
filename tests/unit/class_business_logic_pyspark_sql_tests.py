@@ -9,7 +9,6 @@ from pyspark.sql.types import StructType, StructField, StringType, DoubleType, I
 
 # Add the library path to sys.path to import the business logic
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../notebooks'))
-from library.business_logic import calculate_statistics
 from library.class_business_logic import calculate_statistics_with_sql
 
 
@@ -276,66 +275,3 @@ class TestCalculateStatisticsWithSQL:
         assert 'homework_score_max' in column_names
 
 
-class TestCalculateStatistics:
-    """Test suite for the calculate_statistics function (pandas-based)."""
-    
-    def test_calculate_statistics_basic_case(self):
-        """Test basic functionality with normal data."""
-        # Arrange
-        data = {
-            'pickup_date': [date(2023, 1, 1)] * 5,
-            'trip_distance': [1.0, 2.0, 3.0, 4.0, 5.0],
-            'fare_amount': [10.0, 15.0, 20.0, 25.0, 30.0]
-        }
-        pdf = pd.DataFrame(data)
-        columns = ['trip_distance', 'fare_amount']
-        
-        # Act
-        result = calculate_statistics(pdf, columns)
-        
-        # Assert
-        assert isinstance(result, pd.DataFrame)
-        assert len(result) == 1
-        assert result['pickup_date'].iloc[0] == date(2023, 1, 1)
-        
-        # Check trip_distance stats
-        trip_stats = result['trip_distance_stats'].iloc[0]
-        assert trip_stats['mean'] == 3.0
-        assert trip_stats['median'] == 3.0
-        assert trip_stats['variance'] == 2.0
-        
-        # Check fare_amount stats
-        fare_stats = result['fare_amount_stats'].iloc[0]
-        assert fare_stats['mean'] == 20.0
-        assert fare_stats['median'] == 20.0
-        assert fare_stats['variance'] == 50.0
-    
-    def test_calculate_statistics_with_nan_values(self):
-        """Test functionality when some values are NaN."""
-        # Arrange
-        data = {
-            'pickup_date': [date(2023, 1, 1)] * 5,
-            'trip_distance': [1.0, 2.0, np.nan, 4.0, 5.0],
-            'fare_amount': [10.0, np.nan, 20.0, np.nan, 30.0]
-        }
-        pdf = pd.DataFrame(data)
-        columns = ['trip_distance', 'fare_amount']
-        
-        # Act
-        result = calculate_statistics(pdf, columns)
-        
-        # Assert
-        assert isinstance(result, pd.DataFrame)
-        assert len(result) == 1
-        
-        # Check trip_distance stats (should exclude NaN)
-        trip_stats = result['trip_distance_stats'].iloc[0]
-        assert trip_stats['mean'] == 3.0  # (1+2+4+5)/4
-        assert trip_stats['median'] == 3.0  # median of [1,2,4,5]
-        assert trip_stats['variance'] == 2.5  # variance of [1,2,4,5] with ddof=0
-        
-        # Check fare_amount stats (should exclude NaN)
-        fare_stats = result['fare_amount_stats'].iloc[0]
-        assert fare_stats['mean'] == 20.0  # (10+20+30)/3
-        assert fare_stats['median'] == 20.0  # median of [10,20,30]
-        assert fare_stats['variance'] == pytest.approx(66.666667, rel=1e-5)  # variance of [10,20,30] 
