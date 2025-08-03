@@ -12,23 +12,21 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../notebooks'))
 from library.class_business_logic import calculate_statistics_with_sql
 
 
-spark = SparkSession.builder.appName("TestCalculateStatisticsWithSQL").getOrCreate()
+@pytest.fixture
+def spark() -> SparkSession:
+  # Create a SparkSession (the entry point to Spark functionality) on
+  # the cluster in the remote Databricks workspace. Unit tests do not
+  # have access to this SparkSession by default.
+  # reuse this block for all pyspark and pyspark sql tests.  
+  # reference: https://docs.databricks.com/aws/en/dev-tools/vscode-ext/pytest
+  return SparkSession.builder.getOrCreate()
 
 class TestCalculateStatisticsWithSQL:
     """Test suite for the calculate_statistics_with_sql function."""
     
-    # @classmethod
-    # def setup_class(cls):
-    #     """Set up Spark session for testing."""
-    #     cls.spark = SparkSession.builder.appName("TestCalculateStatisticsWithSQL2").getOrCreate()
-    
-    # @classmethod
-    # def teardown_class(cls):
-    #     """Clean up Spark session after testing."""
-    #     cls.spark.stop()
-    
-    def test_calculate_statistics_with_sql_basic_case(self):
+    def test_calculate_statistics_with_sql_basic_case(self, spark):
         """Test basic functionality with normal data."""
+        # the spark session is passed as a fixture
         # Arrange
         schema = StructType([
             StructField("class_id", StringType(), True),
@@ -72,7 +70,7 @@ class TestCalculateStatisticsWithSQL:
         assert science_result['score_min'] == 82.0
         assert science_result['score_max'] == 95.0
     
-    def test_calculate_statistics_with_sql_multiple_columns(self):
+    def test_calculate_statistics_with_sql_multiple_columns(self, spark):
         """Test functionality with multiple columns."""
         # Arrange
         schema = StructType([
@@ -109,7 +107,7 @@ class TestCalculateStatisticsWithSQL:
         assert result_row['attendance_min'] == 85.0
         assert result_row['attendance_max'] == 95.0
     
-    def test_calculate_statistics_with_sql_single_row_per_class(self):
+    def test_calculate_statistics_with_sql_single_row_per_class(self, spark):
         """Test functionality with single row per class."""
         # Arrange
         schema = StructType([
@@ -138,7 +136,7 @@ class TestCalculateStatisticsWithSQL:
             assert row['score_average'] == row['score_min']
             assert row['score_average'] == row['score_max']
     
-    def test_calculate_statistics_with_sql_null_values(self):
+    def test_calculate_statistics_with_sql_null_values(self, spark):
         """Test functionality with null values in the data."""
         # Arrange
         schema = StructType([
@@ -167,7 +165,7 @@ class TestCalculateStatisticsWithSQL:
         assert result_row['score_min'] == 85.0
         assert result_row['score_max'] == 90.0
     
-    def test_calculate_statistics_with_sql_empty_columns_list(self):
+    def test_calculate_statistics_with_sql_empty_columns_list(self, spark):
         """Test functionality with empty columns list."""
         # Arrange
         schema = StructType([
@@ -191,7 +189,7 @@ class TestCalculateStatisticsWithSQL:
         # No score statistics should be present
         assert 'score_average' not in result_row.asDict()
     
-    def test_calculate_statistics_with_sql_identical_values(self):
+    def test_calculate_statistics_with_sql_identical_values(self, spark):
         """Test functionality when all values in a column are identical."""
         # Arrange
         schema = StructType([
@@ -219,7 +217,7 @@ class TestCalculateStatisticsWithSQL:
         assert result_row['score_max'] == 85.0
     
     
-    def test_calculate_statistics_with_sql_decimal_precision(self):
+    def test_calculate_statistics_with_sql_decimal_precision(self, spark):
         """Test functionality with decimal numbers requiring precision."""
         # Arrange
         schema = StructType([
@@ -247,7 +245,7 @@ class TestCalculateStatisticsWithSQL:
         assert result_row['score_min'] == 78.789
         assert result_row['score_max'] == 90.456
     
-    def test_calculate_statistics_with_sql_column_naming(self):
+    def test_calculate_statistics_with_sql_column_naming(self, spark):
         """Test that column names are generated correctly."""
         # Arrange
         schema = StructType([
