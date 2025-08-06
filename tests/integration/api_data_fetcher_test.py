@@ -44,7 +44,9 @@ def mock_successful_score_data(spark) -> ps.sql.DataFrame:
 @pytest.fixture
 def mock_successful_joined_data(spark) -> ps.sql.DataFrame:
     """Fixture to provide mock joined data from the class and score APIs"""
-    df_joined = spark.read.csv("file:/Workspace/sample_data/Joined_Dataset.csv", header=True, inferSchema=True)
+    joined_data_path = os.path.join(CURRENT_DIR, "../sample_data/Joined_Class_and_Score_Dataset.csv")
+    joined_data_path = "file:/Workspace" + joined_data_path
+    df_joined = spark.read.csv(joined_data_path, header=True, inferSchema=True)
     return df_joined
 
 def test_inner_join_dataframes(spark, mock_successful_class_data, mock_successful_score_data, mock_successful_joined_data):
