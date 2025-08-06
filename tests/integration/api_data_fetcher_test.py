@@ -3,11 +3,15 @@ import os
 import pytest
 from unittest.mock import patch
 from pyspark.sql import SparkSession
+import pyspark as ps
 import pandas as pd
 import pyspark.sql as ps
+import os
+import sys
 
 # Import the functions to be tested
-from library.fetch_data_from_api import get_class_data_from_api, get_score_data_from_api
+# from library.fetch_data_from_api import get_class_data_from_api, get_score_data_from_api
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../notebooks'))
 from library.class_business_logic import inner_join_dataframes
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -17,7 +21,19 @@ def spark():
     spark = SparkSession.builder.getOrCreate()
     return spark
 
+from library.class_business_logic import inner_join_dataframes
+def call_data_getters_and_join_dataframes(spark):
+    df_class = class_getter(spark)
+    df_score = score_getter(spark)
+    df_joined = inner_join_dataframes(df_class, df_score, "class_id")
+    return df_joined
+
 @pytest.fixture
+def spark() -> SparkSession:
+    """Fixture for creating a Spark session for testing."""
+    spark = SparkSession.builder.getOrCreate()
+    return spark
+
 def mock_successful_class_data(spark) -> ps.sql.DataFrame:
     """Fixture to provide mock class data from the class API"""
     # create the data from sample_data/Class_Dataset.csv
